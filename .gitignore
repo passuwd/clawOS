@@ -1,0 +1,10 @@
+*.o
+*.bin
+*.iso
+*.img
+*.qcow2
+esp/
+isodir/
+core.img
+qemu.log
+xorriso
