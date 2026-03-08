@@ -11,6 +11,8 @@
 #include "e1000.h"
 #include "graphics.h"
 #include "gui.h"
+#include "vfs.h"
+#include "exfat.h"
 
 struct multiboot_tag {
     uint32_t type;
@@ -54,6 +56,9 @@ extern "C" void kernel_main(uint32_t magic, uint32_t mb2_info) {
     if (e1000_dev) {
         E1000::init(e1000_dev);
     }
+
+    VFS::init();
+    ExFAT::init();
 
     struct multiboot_tag_framebuffer* fb = nullptr;
     uint8_t* tags = (uint8_t*)(uint64_t)mb2_info;
