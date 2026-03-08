@@ -7,7 +7,7 @@ CFLAGS = -m64 -ffreestanding -mcmodel=kernel -mno-red-zone -O2 -Wall -Wextra -fn
 ASFLAGS32 = -m32
 LDFLAGS = -n -T src/linker.ld -m elf_x86_64 -z max-page-size=0x1000
 
-OBJS = src/boot/boot.o src/boot/boot64.o src/kernel/main.o
+OBJS = src/boot/boot.o src/boot/boot64.o src/kernel/main.o src/kernel/gdt.o src/kernel/gdt_asm.o
 
 clawos.bin: $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^
@@ -20,6 +20,12 @@ src/boot/boot64.o: src/boot/boot64.S
 
 src/kernel/main.o: src/kernel/main.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+src/kernel/gdt.o: src/kernel/gdt.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+src/kernel/gdt_asm.o: src/kernel/gdt_asm.S
+	$(CC) $(CFLAGS) -c $< -o $@
 
 .PHONY: clean run build esp
 

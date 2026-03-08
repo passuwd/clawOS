@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <stddef.h>
+#include "gdt.h"
 
 struct multiboot_tag {
     uint32_t type;
@@ -47,6 +48,8 @@ extern "C" void kernel_main(uint32_t magic, uint32_t mb2_info) {
     if (magic != 0x36d76289) {
         return; 
     }
+
+    GDT::init();
 
     struct multiboot_tag_framebuffer* fb = nullptr;
     uint8_t* tags = (uint8_t*)(uint64_t)mb2_info;
