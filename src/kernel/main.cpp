@@ -4,6 +4,8 @@
 #include "idt.h"
 #include "pic.h"
 #include "serial.h"
+#include "pmm.h"
+#include "vmm.h"
 
 struct multiboot_tag {
     uint32_t type;
@@ -58,6 +60,9 @@ extern "C" void kernel_main(uint32_t magic, uint32_t mb2_info) {
     GDT::init();
     PIC::remap(0x20, 0x28);
     IDT::init();
+
+    PMM::init(mb2_info);
+    VMM::init();
 
     struct multiboot_tag_framebuffer* fb = nullptr;
     uint8_t* tags = (uint8_t*)(uint64_t)mb2_info;
