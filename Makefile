@@ -7,7 +7,7 @@ CFLAGS = -m64 -ffreestanding -mcmodel=kernel -mno-red-zone -O2 -Wall -Wextra -fn
 ASFLAGS32 = -m32
 LDFLAGS = -n -T src/linker.ld -m elf_x86_64 -z max-page-size=0x1000
 
-OBJS = src/boot/boot.o src/boot/boot64.o src/kernel/main.o src/kernel/gdt.o src/kernel/gdt_asm.o
+OBJS = src/boot/boot.o src/boot/boot64.o src/kernel/main.o src/kernel/gdt.o src/kernel/gdt_asm.o src/kernel/serial.o src/kernel/idt.o src/kernel/isr.o src/kernel/isr_asm.o src/kernel/pic.o
 
 clawos.bin: $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^
@@ -27,6 +27,21 @@ src/kernel/gdt.o: src/kernel/gdt.cpp
 src/kernel/gdt_asm.o: src/kernel/gdt_asm.S
 	$(CC) $(CFLAGS) -c $< -o $@
 
+src/kernel/serial.o: src/kernel/serial.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+src/kernel/idt.o: src/kernel/idt.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+src/kernel/isr.o: src/kernel/isr.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+src/kernel/isr_asm.o: src/kernel/isr_asm.S
+	$(CC) $(CFLAGS) -c $< -o $@
+
+src/kernel/pic.o: src/kernel/pic.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
 .PHONY: clean run build esp
 
 build: clawos.bin esp
@@ -41,4 +56,4 @@ clean:
 	rm -rf esp/boot/clawos.bin
 
 run: build
-	qemu-system-x86_64 -m 256M -vga std -net nic,model=e1000 -net user -d guest_errors,int,cpu_reset -D qemu.log -vnc :0 -drive if=pflash,format=raw,readonly=on,file=/usr/share/qemu/edk2-x86_64-code.fd -drive file=fat:rw:esp,format=raw
+	qemu-system-x86_64 -m 256M -vga std -net nic,model=e1000 -net user -d guest_errors,int,cpu_reset -D qemu.log -serial file:serial.log -vnc :0 -drive if=pflash,format=raw,readonly=on,file=/usr/share/qemu/edk2-x86_64-code.fd -drive file=fat:rw:esp,format=raw

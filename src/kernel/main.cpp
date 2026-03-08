@@ -1,6 +1,9 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "gdt.h"
+#include "idt.h"
+#include "pic.h"
+#include "serial.h"
 
 struct multiboot_tag {
     uint32_t type;
@@ -49,7 +52,12 @@ extern "C" void kernel_main(uint32_t magic, uint32_t mb2_info) {
         return; 
     }
 
+    Serial::init();
+    Serial::write_string("Booting clawOS...\n");
+
     GDT::init();
+    PIC::remap(0x20, 0x28);
+    IDT::init();
 
     struct multiboot_tag_framebuffer* fb = nullptr;
     uint8_t* tags = (uint8_t*)(uint64_t)mb2_info;
