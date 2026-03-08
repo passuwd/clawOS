@@ -5,9 +5,9 @@
 
 namespace VMM {
 
-#define PAGE_PRESENT  (1 << 0)
-#define PAGE_WRITE    (1 << 1)
-#define PAGE_USER     (1 << 2)
+static constexpr uint64_t PAGE_PRESENT = (1 << 0);
+static constexpr uint64_t PAGE_WRITE   = (1 << 1);
+static constexpr uint64_t PAGE_USER    = (1 << 2);
 
 void init();
 uint64_t* create_pml4();

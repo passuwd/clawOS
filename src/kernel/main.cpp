@@ -6,6 +6,7 @@
 #include "serial.h"
 #include "pmm.h"
 #include "vmm.h"
+#include "userspace.h"
 
 struct multiboot_tag {
     uint32_t type;
@@ -49,6 +50,11 @@ void draw_circle(struct multiboot_tag_framebuffer* fb, int cx, int cy, int radiu
     }
 }
 
+void user_test() {
+    Serial::write_string("Hello from User Mode!\n");
+    while (1);
+}
+
 extern "C" void kernel_main(uint32_t magic, uint32_t mb2_info) {
     if (magic != 0x36d76289) {
         return; 
@@ -84,6 +90,9 @@ extern "C" void kernel_main(uint32_t magic, uint32_t mb2_info) {
         int radius = 100;
         draw_circle(fb, cx, cy, radius, 0x00FF0000); // Red
     }
+
+    uint8_t* user_stack = (uint8_t*)PMM::alloc_page();
+    Userspace::jump_to_user((void*)user_test, (void*)(user_stack + 4096));
 
     while (true) {
         asm volatile("hlt");
