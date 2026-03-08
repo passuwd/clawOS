@@ -7,7 +7,7 @@ CFLAGS = -m64 -ffreestanding -mcmodel=kernel -mno-red-zone -O2 -Wall -Wextra -fn
 ASFLAGS32 = -m32
 LDFLAGS = -n -T src/linker.ld -m elf_x86_64 -z max-page-size=0x1000
 
-OBJS = src/boot/boot.o src/boot/boot64.o src/kernel/main.o src/kernel/gdt.o src/kernel/gdt_asm.o src/kernel/serial.o src/kernel/idt.o src/kernel/isr.o src/kernel/isr_asm.o src/kernel/pic.o src/kernel/pmm.o src/kernel/vmm.o src/kernel/userspace.o src/kernel/userspace_asm.o
+OBJS = src/boot/boot.o src/boot/boot64.o src/kernel/main.o src/kernel/gdt.o src/kernel/gdt_asm.o src/kernel/serial.o src/kernel/idt.o src/kernel/isr.o src/kernel/isr_asm.o src/kernel/pic.o src/kernel/pmm.o src/kernel/vmm.o src/kernel/userspace.o src/kernel/userspace_asm.o src/kernel/pci.o src/kernel/e1000.o
 
 clawos.bin: $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^
@@ -53,6 +53,12 @@ src/kernel/userspace.o: src/kernel/userspace.cpp
 
 src/kernel/userspace_asm.o: src/kernel/userspace_asm.S
 	$(CC) $(CFLAGS) -c $< -o $@
+
+src/kernel/pci.o: src/kernel/pci.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+src/kernel/e1000.o: src/kernel/e1000.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 .PHONY: clean run build esp
 

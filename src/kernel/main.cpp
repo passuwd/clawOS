@@ -7,6 +7,8 @@
 #include "pmm.h"
 #include "vmm.h"
 #include "userspace.h"
+#include "pci.h"
+#include "e1000.h"
 
 struct multiboot_tag {
     uint32_t type;
@@ -69,6 +71,12 @@ extern "C" void kernel_main(uint32_t magic, uint32_t mb2_info) {
 
     PMM::init(mb2_info);
     VMM::init();
+
+    PCI::init();
+    PCI::Device* e1000_dev = PCI::find_device(0x8086, 0x100E);
+    if (e1000_dev) {
+        E1000::init(e1000_dev);
+    }
 
     struct multiboot_tag_framebuffer* fb = nullptr;
     uint8_t* tags = (uint8_t*)(uint64_t)mb2_info;
